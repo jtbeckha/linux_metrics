@@ -12,4 +12,5 @@ docker pull influxdb
 docker run -p 8086:8086 \
       -v $PWD/influxdb.conf.dev:/etc/influxdb/influxdb.conf:ro \
       influxdb -config /etc/influxdb/influxdb.conf
+influx -execute 'SHOW DATABASES'
 ```

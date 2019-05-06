@@ -1,11 +1,9 @@
 package main
 
 import (
-	"context"
-	"github.com/influxdata/influxdb-client-go"
+	client "github.com/influxdata/influxdb1-client/v2"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 	"os"
 	"time"
 )
@@ -27,28 +25,39 @@ func main() {
 		panic(err)
 	}
 
-	influx, err := influxdb.New(
-		nil, influxdb.WithAddress(conf.InfluxAddress), influxdb.WithToken(conf.InfluxToken))
+	influx, err := client.NewHTTPClient(client.HTTPConfig{
+		Addr: conf.InfluxAddress,
+	})
 	if err != nil {
 		panic(err)
 	}
 
+	defer influx.Close()
+
 	hostname, err := os.Hostname()
 
-	// TODO get actual metrics
-	myMetrics := []influxdb.Metric{
-		influxdb.NewRowMetric(
-			map[string]interface{}{"memory": 1000, "cpu": 0.93},
-			"system-metrics",
-			map[string]string{"hostname": hostname},
-			time.Now().UTC()),
+	point, err := client.NewPoint(
+		"system",
+		map[string]string{"hostname": hostname},
+		map[string]interface{}{"memory": 1000, "cpu": 0.93},
+		time.Now().UTC())
+	if err != nil {
+		panic(err)
 	}
 
-	if err := influx.Write(context.Background(), "my-awesome-bucket", "my-awesome-org", myMetrics...); err != nil {
-		log.Fatal(err)
+	bpConfig := client.BatchPointsConfig{
+		Database: "System",
+		RetentionPolicy: "autogen",
 	}
-}
+	bps, err := client.NewBatchPoints(bpConfig)
+	if err != nil {
+		panic(err)
+	}
 
-func reportMetrics(influx *influxdb.Client, bucket string, org string, metrics []influxdb.Metric) error {
-	return influx.Write(context.Background(), bucket, org, metrics...)
+	bps.AddPoint(point)
+
+	err = influx.Write(bps)
+	if err != nil {
+		panic(err)
+	}
 }
