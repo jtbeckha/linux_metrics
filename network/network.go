@@ -9,12 +9,13 @@ import (
 )
 
 const metricsFile = "/proc/net/dev"
+const namespace = "network"
 
 // Get network metrics.
 func GetMetrics() map[string]interface{} {
 	dataBytes, err := ioutil.ReadFile(metricsFile)
 	if err != nil {
-		log.Println("Unable to open " + metricsFile + ", network stats will not be available")
+		log.Println("Unable to open "+metricsFile+", network stats will not be available", err)
 		return nil
 	}
 
@@ -23,6 +24,10 @@ func GetMetrics() map[string]interface{} {
 	return ParseMetrics(data)
 }
 
+/*
+Parse network-related metrics from the provided data string. Data is assumed to be in the format provided by
+/proc/net/dev. Returns a map of metric name->value pairs.
+*/
 func ParseMetrics(data string) map[string]interface{} {
 	lines := strings.Split(data, "\n")
 
@@ -74,13 +79,13 @@ func ParseMetrics(data string) map[string]interface{} {
 		for index, value := range metricValues[:len(metricLabelsRx)] {
 			direction := directions[0]
 			label := metricLabelsRx[index]
-			metrics[interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
+			metrics[namespace+"."+interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
 
 		}
 		for index, value := range metricValues[len(metricLabelsTx):] {
 			direction := directions[1]
 			label := metricLabelsTx[index]
-			metrics[interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
+			metrics[namespace+"."+interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
 		}
 	}
 
