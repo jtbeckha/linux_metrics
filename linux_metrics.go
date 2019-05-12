@@ -9,9 +9,9 @@ import (
 )
 
 type Config struct {
-	Environment 	string 	`yaml:"environment"`
-	InfluxAddress 	string 	`yaml:"influxAddress"`
-	InfluxToken		string	`yaml:"influxToken"`
+	Environment   string `yaml:"environment"`
+	InfluxAddress string `yaml:"influxAddress"`
+	InfluxToken   string `yaml:"influxToken"`
 }
 
 func main() {
@@ -36,17 +36,19 @@ func main() {
 
 	hostname, err := os.Hostname()
 
+	networkMetrics := GetNetworkMetrics()
+
 	point, err := client.NewPoint(
 		"system",
 		map[string]string{"hostname": hostname},
-		map[string]interface{}{"memory": 1000, "cpu": 0.93},
+		networkMetrics,
 		time.Now().UTC())
 	if err != nil {
 		panic(err)
 	}
 
 	bpConfig := client.BatchPointsConfig{
-		Database: "System",
+		Database:        "System",
 		RetentionPolicy: "autogen",
 	}
 	bps, err := client.NewBatchPoints(bpConfig)
