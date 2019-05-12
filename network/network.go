@@ -9,7 +9,6 @@ import (
 )
 
 const metricsFile = "/proc/net/dev"
-const namespace = "network"
 
 // Get network metrics.
 func GetMetrics() map[string]interface{} {
@@ -79,13 +78,13 @@ func ParseMetrics(data string) map[string]interface{} {
 		for index, value := range metricValues[:len(metricLabelsRx)] {
 			direction := directions[0]
 			label := metricLabelsRx[index]
-			metrics[namespace+"."+interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
+			metrics[interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
 
 		}
 		for index, value := range metricValues[len(metricLabelsTx):] {
 			direction := directions[1]
 			label := metricLabelsTx[index]
-			metrics[namespace+"."+interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
+			metrics[interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
 		}
 	}
 

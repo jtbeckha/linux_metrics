@@ -2,6 +2,7 @@ package main
 
 import (
 	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/jtbeckha/linux_metrics/cpu"
 	"github.com/jtbeckha/linux_metrics/network"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -36,18 +37,6 @@ func main() {
 	defer influx.Close()
 
 	hostname, err := os.Hostname()
-
-	networkMetrics := network.GetMetrics()
-
-	point, err := client.NewPoint(
-		"system",
-		map[string]string{"hostname": hostname},
-		networkMetrics,
-		time.Now().UTC())
-	if err != nil {
-		panic(err)
-	}
-
 	bpConfig := client.BatchPointsConfig{
 		Database:        "System",
 		RetentionPolicy: "autogen",
@@ -57,6 +46,26 @@ func main() {
 		panic(err)
 	}
 
+	networkMetrics := network.GetMetrics()
+	point, err := client.NewPoint(
+		"network",
+		map[string]string{"hostname": hostname},
+		networkMetrics,
+		time.Now().UTC())
+	if err != nil {
+		panic(err)
+	}
+	bps.AddPoint(point)
+
+	cpuMetrics := cpu.GetMetrics()
+	point, err = client.NewPoint(
+		"cpu",
+		map[string]string{"hostname": hostname},
+		cpuMetrics,
+		time.Now().UTC())
+	if err != nil {
+		panic(err)
+	}
 	bps.AddPoint(point)
 
 	err = influx.Write(bps)

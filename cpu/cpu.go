@@ -10,7 +10,6 @@ import (
 )
 
 const metricsFile = "/proc/stat"
-const namespace = "cpu"
 
 var metricLabels = [10]string{
 	"user",
@@ -82,7 +81,7 @@ func ParseMetrics(data string) map[string]interface{} {
 		metricLabel := metricLabels[index]
 		metricValue, _ := strconv.Atoi(metricValues[index])
 
-		metrics[namespace+".aggregate."+metricLabel] = metricValue
+		metrics["aggregate."+metricLabel] = metricValue
 	}
 
 	return metrics
