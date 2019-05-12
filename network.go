@@ -9,7 +9,7 @@ import (
 
 const statsFile = "/proc/net/dev"
 
-func getNetworkMetrics() map[string]interface{} {
+func GetNetworkMetrics() map[string]interface{} {
 	dataBytes, err := ioutil.ReadFile(statsFile)
 	if err != nil {
 		log.Println("Unable to open " + statsFile + ", network stats will not be available")
@@ -18,10 +18,10 @@ func getNetworkMetrics() map[string]interface{} {
 
 	data := string(dataBytes)
 
-	return parseMetrics(data)
+	return ParseMetrics(data)
 }
 
-func parseMetrics(data string) map[string]interface{} {
+func ParseMetrics(data string) map[string]interface{} {
 	lines := strings.Split(data, "\n")
 
 	// "receive", "transmit"
@@ -72,16 +72,15 @@ func parseMetrics(data string) map[string]interface{} {
 		for index, value := range metricValues[:len(metricLabelsRx)] {
 			direction := directions[0]
 			label := metricLabelsRx[index]
-			metrics[interfaceName + "." + direction + "." + label], _ = strconv.Atoi(value)
+			metrics[interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
 
 		}
 		for index, value := range metricValues[len(metricLabelsTx):] {
 			direction := directions[1]
 			label := metricLabelsTx[index]
-			metrics[interfaceName + "." + direction + "." + label], _ = strconv.Atoi(value)
+			metrics[interfaceName+"."+direction+"."+label], _ = strconv.Atoi(value)
 		}
 	}
 
 	return metrics
 }
-
