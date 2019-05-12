@@ -13,7 +13,6 @@ import (
 type Config struct {
 	Environment   string `yaml:"environment"`
 	InfluxAddress string `yaml:"influxAddress"`
-	InfluxToken   string `yaml:"influxToken"`
 }
 
 func main() {
