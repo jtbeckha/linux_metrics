@@ -1,4 +1,4 @@
-#Linux Metrics
+# Linux Metrics
 
 Gather metrics on your linux system and ship them off to a time-series database (influxdb) for analysis.
 
