@@ -1,3 +1,4 @@
+// Package network contains functions for gathering network-related metrics.
 package network
 
 import (
@@ -7,12 +8,13 @@ import (
 	"strings"
 )
 
-const statsFile = "/proc/net/dev"
+const metricsFile = "/proc/net/dev"
 
+// Get network metrics.
 func GetMetrics() map[string]interface{} {
-	dataBytes, err := ioutil.ReadFile(statsFile)
+	dataBytes, err := ioutil.ReadFile(metricsFile)
 	if err != nil {
-		log.Println("Unable to open " + statsFile + ", network stats will not be available")
+		log.Println("Unable to open " + metricsFile + ", network stats will not be available")
 		return nil
 	}
 
@@ -27,7 +29,7 @@ func ParseMetrics(data string) map[string]interface{} {
 	// "receive", "transmit"
 	directions := strings.Split(lines[0], "|")[1:]
 	if len(directions) != 2 {
-		log.Println("Unexpected top-level header format encountered in " + statsFile)
+		log.Println("Unexpected top-level header format encountered in " + metricsFile)
 		return nil
 	}
 	for index, section := range directions {
