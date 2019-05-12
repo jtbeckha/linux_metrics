@@ -2,6 +2,7 @@ package main
 
 import (
 	client "github.com/influxdata/influxdb1-client/v2"
+	"github.com/jtbeckha/linux_metrics/network"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -36,7 +37,7 @@ func main() {
 
 	hostname, err := os.Hostname()
 
-	networkMetrics := GetNetworkMetrics()
+	networkMetrics := network.GetMetrics()
 
 	point, err := client.NewPoint(
 		"system",

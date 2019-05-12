@@ -1,4 +1,4 @@
-package main
+package network
 
 import (
 	"io/ioutil"
@@ -9,7 +9,7 @@ import (
 
 const statsFile = "/proc/net/dev"
 
-func GetNetworkMetrics() map[string]interface{} {
+func GetMetrics() map[string]interface{} {
 	dataBytes, err := ioutil.ReadFile(statsFile)
 	if err != nil {
 		log.Println("Unable to open " + statsFile + ", network stats will not be available")
